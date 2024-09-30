@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="answer.md" />
+  </ItemGroup>
 </Project>
