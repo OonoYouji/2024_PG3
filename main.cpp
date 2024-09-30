@@ -13,7 +13,8 @@ int main() {
 	/// ↑変数の宣言
 	///
 	
-
+	printf("hello world\n");
+	printf("大ノようじ\n");
 
 	
 	
