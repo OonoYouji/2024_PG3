@@ -16,7 +16,7 @@ public:
 
 	Comparison(T1 value1, T2 value2) : value1_(value1), value2_(value2) {}
 
-	auto Result() {
+	auto Min() {
 		using Type = typename std::common_type<T1, T2>::type;
 		Type min = (static_cast<Type>(value1_) < static_cast<Type>(value2_)) ? value1_ : value2_;
 		return min;

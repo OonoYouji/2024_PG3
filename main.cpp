@@ -22,12 +22,12 @@ int main() {
 	/// 実行
 	/// ================================================
 
-	std::cout << "result : " << com1.Result() << std::endl;
-	std::cout << "result : " << com2.Result() << std::endl;
-	std::cout << "result : " << com3.Result() << std::endl;
-	std::cout << "result : " << com4.Result() << std::endl;
-	std::cout << "result : " << com5.Result() << std::endl;
-	std::cout << "result : " << com6.Result() << std::endl;
+	std::cout << "result : " << com1.Min() << std::endl;
+	std::cout << "result : " << com2.Min() << std::endl;
+	std::cout << "result : " << com3.Min() << std::endl;
+	std::cout << "result : " << com4.Min() << std::endl;
+	std::cout << "result : " << com5.Min() << std::endl;
+	std::cout << "result : " << com6.Min() << std::endl;
 
 	return 0;
 }
