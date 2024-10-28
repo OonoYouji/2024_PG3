@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Polymorphism\Polymorphism.cpp" />
+    <ClCompile Include="Shape\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Polymorphism\Polymorphism.h" />
+    <ClInclude Include="Shape\Shape.h" />
   </ItemGroup>
 </Project>

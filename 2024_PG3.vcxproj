@@ -132,10 +132,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Polymorphism\Polymorphism.cpp" />
+    <ClCompile Include="Shape\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Polymorphism\Polymorphism.h" />
+    <ClInclude Include="Shape\Shape.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
