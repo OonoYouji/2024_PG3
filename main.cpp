@@ -1,9 +1,9 @@
 /// std
 #include <stdio.h>
 #include <memory>
+#include <iostream>
 
-/// entity
-#include "Enemy/Enemy.h"
+#include "Comparison/Comparison.h"
 
 int main() {
 
@@ -11,17 +11,23 @@ int main() {
 	/// 変数宣言
 	/// ================================================
 
-	std::unique_ptr<Enemy> enemy = std::make_unique<Enemy>();
-	enemy->Initialize();
+	Comparison com1 = Comparison<int,    float> (1, 1.2f);
+	Comparison com2 = Comparison<double, float> (3.145654, 2135.0f);
+	Comparison com3 = Comparison<double, int>   (3.145654, 2);
+	Comparison com4 = Comparison<int,    int>   (1, 5);
+	Comparison com5 = Comparison<float,  float> (2.45f, 1.2f);
+	Comparison com6 = Comparison<double, double>(165.565, 265.16546);
 
 	/// ================================================
 	/// 実行
 	/// ================================================
 
-	while(!enemy->GetIsFinish()) {
-
-		enemy->Update();
-	}
+	std::cout << "result : " << com1.Result() << std::endl;
+	std::cout << "result : " << com2.Result() << std::endl;
+	std::cout << "result : " << com3.Result() << std::endl;
+	std::cout << "result : " << com4.Result() << std::endl;
+	std::cout << "result : " << com5.Result() << std::endl;
+	std::cout << "result : " << com6.Result() << std::endl;
 
 	return 0;
 }

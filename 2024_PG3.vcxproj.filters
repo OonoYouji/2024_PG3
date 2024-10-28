@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Enemy\Enemy.cpp" />
+    <ClCompile Include="Comparison\Comparison.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Enemy\Enemy.h" />
+    <ClInclude Include="Comparison\Comparison.h" />
   </ItemGroup>
 </Project>
