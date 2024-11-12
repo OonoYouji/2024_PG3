@@ -28,7 +28,6 @@ int main() {
 		}
 
 
-		/// 円の計算に入る
 		if(inputString == "circle" || inputString == "Circle") {
 			std::cout << "    args -> radius" << std::endl;
 			std::cout << "    ";
@@ -48,8 +47,6 @@ int main() {
 			}
 		}
 
-
-		/// 矩形の計算
 		if(inputString == "rectangle" || inputString == "Rectangle") {
 			std::cout << "    args -> width, height" << std::endl;
 			std::cout << "    ";
