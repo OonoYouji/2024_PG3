@@ -1,25 +1,36 @@
-/// std
-#include <thread>
-#include <iostream>
 
+/// std
+#include <iostream>
+#include <string>
+#include <chrono>
 
 
 
 
 int main() {
 
-	/// ================================================
-	/// 変数宣言
-	/// ================================================
+	/// 10万文字の文字列を生成
+	std::string srcString(100000, 'a');
 
-	std::thread th1([]() { printf("Thread 1\n"); });
-	th1.join();
+	/// copyにかかる時間をchrono(マイクロ秒)で計測
+	auto          copyStartTime = std::chrono::high_resolution_clock::now();
+	std::string   copyStr       = srcString;
+	auto          copyEndTime   = std::chrono::high_resolution_clock::now();
 
-	std::thread th2([]() { printf("Thread 2\n"); });
-	th2.join();
+	/// moveにかかる時間
+	auto          moveStartTime = std::chrono::high_resolution_clock::now();
+	std::string&& moveStr       = std::move(srcString);
+	auto          moveEndTime   = std::chrono::high_resolution_clock::now();
 
-	std::thread th3([]() { printf("Thread 3\n"); });
-	th3.join();
+
+
+	/// consoleに結果をマイクロ秒で出力
+	float copyDuration = std::chrono::duration<float, std::micro>(copyEndTime - copyStartTime).count();
+	float moveDuration = std::chrono::duration<float, std::micro>(moveEndTime - moveStartTime).count();
+
+	std::cout << "100000文字のcopyにかかる時間とmoveにかかる時間を計測" << std::endl;
+	std::cout << "copy time: " << copyDuration << " μs" << std::endl;
+	std::cout << "move time: " << moveDuration << " μs" << std::endl;
 
 	return 0;
 }
