@@ -30,12 +30,14 @@ int main() {
 	printf("/// 何時間働くと、再帰的な賃金体系の方が儲かるか計算する\n");
 	printf("--------------------------------------------------------------------------------\n");
 
-	int count = 0;
+	int count          = 0;
+	int defaultSalary  = 0;
+	int recoverySalary = 0;
 	while(true) {
 		count++;
 
-		int defaultSalary  = Salary(count);
-		int recoverySalary = Salary(count, false);
+		defaultSalary  += Salary(count);
+		recoverySalary += Salary(count, false);
 	
 		if(recoverySalary > defaultSalary) {
 			printf("/// 再帰的な賃金体系が一般的な賃金体系の給与を超えたので計算を終了する\n");
