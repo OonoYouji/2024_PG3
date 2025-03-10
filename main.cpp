@@ -1,83 +1,105 @@
-#include <stdio.h>
-#include <format>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+
+#include "project/FactoryRegister.h"
 
 
-/// <summary>
-/// 給与計算関数:時給1072円
-/// </summary>
-/// <param name="time">		稼働時間(h)</param>
-/// <param name="isDefault">通常の給与計算をするか</param>
-/// <returns>給与</returns>
-int Salary(int time, bool isDefault = true);
+class CreateClassFileCommand {
+public:
 
-int DefaultSalary(int time);
-int RecoverySalary(int time);
+	void Execute(const std::string& _className, const std::string& _directory = "./") {
+		///< ファイル名を作成
+		std::string&& headerFilepath = _directory + "/" + _className + ".h";
+		std::string&& cppFilepath = _directory + "/" + _className + ".cpp";
 
+		/// .hファイルの作成
+		std::ifstream templateHeaderFile(templateHeaderFilepath_, std::ios::binary);
+		std::ofstream newHeaderFile(headerFilepath, std::ios::binary);
+		std::string headerContent((std::istreambuf_iterator<char>(templateHeaderFile)), std::istreambuf_iterator<char>());
+		size_t pos = 0;
+		while ((pos = headerContent.find("Template", pos)) != std::string::npos) {
+			headerContent.replace(pos, 8, _className);
+			pos += _className.length();
+		}
+		newHeaderFile << headerContent;
+
+
+		///< cppファイルの作成
+		std::ifstream templateCppFile(templateCppFilepath_, std::ios::binary);
+		std::ofstream newCppFile(cppFilepath, std::ios::binary);
+		std::string cppContent((std::istreambuf_iterator<char>(templateCppFile)), std::istreambuf_iterator<char>());
+		pos = 0;
+		while ((pos = cppContent.find("Template", pos)) != std::string::npos) {
+			cppContent.replace(pos, 8, _className);
+			pos += _className.length();
+		}
+		newCppFile << cppContent;
+	}
+
+private:
+	std::string templateHeaderFilepath_ = "./project/Template.h";
+	std::string templateCppFilepath_ = "./project/Template.cpp";
+};
+
+
+
+void ModifyFactoryRegister(const std::string& filePath, const std::string& includePath, const std::string& registerCall) {
+	std::ifstream inFile(filePath);
+	if (!inFile) {
+		std::cerr << "ファイルを開けませんでした: " << filePath << std::endl;
+		return;
+	}
+
+	std::string fileContent;
+	std::string line;
+	bool includeAdded = false;
+	bool registerAdded = false;
+
+	while (std::getline(inFile, line)) {
+		// `/// include` の直後に `#include` を追加
+		if (line.find("/// include") != std::string::npos && !includeAdded) {
+			fileContent += line + "\n";
+			fileContent += "#include \"" + includePath + "\"\n";
+			includeAdded = true;
+			continue;
+		}
+
+		// `void FactoryRegister::Registers()` の中に処理を追加
+		if (line.find("void FactoryRegister::Registers() {") != std::string::npos && !registerAdded) {
+			fileContent += line + "\n";
+			fileContent += "    " + registerCall + ";\n";
+			registerAdded = true;
+			continue;
+		}
+
+		fileContent += line + "\n";
+	}
+
+	inFile.close();
+
+	// ファイルを上書き
+	std::ofstream outFile(filePath);
+	if (!outFile) {
+		std::cerr << "ファイルを書き込めませんでした: " << filePath << std::endl;
+		return;
+	}
+	outFile << fileContent;
+	outFile.close();
+}
 
 int main() {
 
-	printf("/// 一般的な賃金体系と再起的な賃金体系を比較する\n");
-	printf("--------------------------------------------------------------------------------\n");
+	FactoryRegister factory;
+	CreateClassFileCommand command;
 
-	printf(std::format("	default  salary = {}円\n", Salary(5)).c_str());
-	printf(std::format("	recovery salary = {}円\n", Salary(5, false)).c_str());
+	auto CreateAndRegisterMesthodCreate = [&factory, &command](const std::string& _className) {
+		command.Execute(_className);
+		ModifyFactoryRegister("./project/FactoryRegister.cpp", "../" + _className + ".h", "factory_.Register<" + _className + ">()");
+	};
 
-	printf("--------------------------------------------------------------------------------\n");
-	printf("\n");
-
-
-
-	printf("/// 何時間働くと、再帰的な賃金体系の方が儲かるか計算する\n");
-	printf("--------------------------------------------------------------------------------\n");
-
-	int count          = 0;
-	int defaultSalary  = 0;
-	int recoverySalary = 0;
-	while(true) {
-		count++;
-
-		defaultSalary  += Salary(count);
-		recoverySalary += Salary(count, false);
-	
-		if(recoverySalary > defaultSalary) {
-			printf("/// 再帰的な賃金体系が一般的な賃金体系の給与を超えたので計算を終了する\n");
-
-			printf(std::format("時間 : {}/h\n", count).c_str());
-			printf(std::format("一般的な給与 : {}円\n", defaultSalary).c_str());
-			printf(std::format("再帰的な給与 : {}円\n", recoverySalary).c_str());
-
-			break;
-		}
-	}
-
-
-	printf("--------------------------------------------------------------------------------\n");
-
+	CreateAndRegisterMesthodCreate("Edge");
 
 	return 0;
-}
-
-
-
-
-
-
-int Salary(int time, bool isDefault) {
-	if(isDefault) {
-		return DefaultSalary(time);
-	}
-
-	return RecoverySalary(time);
-}
-
-int DefaultSalary(int time) {
-	const int kOneTimeSalary = 1072;
-	return kOneTimeSalary * time;
-}
-
-int RecoverySalary(int time) {
-	if(time <= 1) {
-		return 100;
-	}
-	return RecoverySalary(time - 1) * 2 - 50;
 }
