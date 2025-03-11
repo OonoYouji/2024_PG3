@@ -2,9 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <cstdlib>
 
 #include "project/FactoryRegister.h"
-
 
 class CreateClassFileCommand {
 public:
@@ -25,7 +25,6 @@ public:
 		}
 		newHeaderFile << headerContent;
 
-
 		///< cppファイルの作成
 		std::ifstream templateCppFile(templateCppFilepath_, std::ios::binary);
 		std::ofstream newCppFile(cppFilepath, std::ios::binary);
@@ -36,14 +35,24 @@ public:
 			pos += _className.length();
 		}
 		newCppFile << cppContent;
+
+		system("premake5 vs2022");
 	}
 
 private:
 	std::string templateHeaderFilepath_ = "./project/Template.h";
 	std::string templateCppFilepath_ = "./project/Template.cpp";
+
+	std::string projectStr = "2024_PG3";
+
+	void AddFileToProject(const std::string& filepath) {
+		// premakeを使用してプロジェクトファイルにファイルを追加する処理をここに実装
+		std::string command = "premake5 --file=premake5.lua vs2019";
+		if (std::system(command.c_str()) != 0) {
+			std::cerr << "premakeコマンドの実行に失敗しました: " << command << std::endl;
+		}
+	}
 };
-
-
 
 void ModifyFactoryRegister(const std::string& filePath, const std::string& includePath, const std::string& registerCall) {
 	std::ifstream inFile(filePath);
@@ -92,14 +101,25 @@ void ModifyFactoryRegister(const std::string& filePath, const std::string& inclu
 int main() {
 
 	FactoryRegister factory;
+	factory.Registers();
 	CreateClassFileCommand command;
 
 	auto CreateAndRegisterMesthodCreate = [&factory, &command](const std::string& _className) {
-		command.Execute(_className);
-		ModifyFactoryRegister("./project/FactoryRegister.cpp", "../" + _className + ".h", "factory_.Register<" + _className + ">()");
+		command.Execute(_className, "./project/createClass");
+		ModifyFactoryRegister("./project/FactoryRegister.cpp", "./createClass/" + _className + ".h", "factory_.Register<" + _className + ">()");
 	};
 
-	CreateAndRegisterMesthodCreate("Edge");
+	while (true) {
+		std::string className;
+		std::cout << "クラス名を入力してください (終了するには 'exit' と入力): ";
+		std::cin >> className;
+
+		if (className == "exit") {
+			break;
+		}
+
+		CreateAndRegisterMesthodCreate(className);
+	}
 
 	return 0;
 }

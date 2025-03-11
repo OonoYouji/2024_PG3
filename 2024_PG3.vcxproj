@@ -136,9 +136,6 @@
     <ClCompile Include="project\Template.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="answer.md" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="project\FactoryRegister.h" />
     <ClInclude Include="project\Template.h" />
   </ItemGroup>
