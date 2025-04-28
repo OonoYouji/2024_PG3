@@ -1,35 +1,40 @@
-#include <Windows.h>
-#include <commdlg.h>
-#include <string>
+#include <stdio.h>
+#include <iostream>
+#include <format>
 
-std::string OpenFileDialog() {
-	OPENFILENAME ofn;       // コモンダイアログボックス構造体
-	wchar_t szFile[260];    // ファイル名を格納するバッファ
-	ZeroMemory(&ofn, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = nullptr;
-	ofn.lpstrFile = szFile;
-	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = L"All\0*.*\0Text\0*.TXT\0";
-	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = nullptr;
-	ofn.nMaxFileTitle = 0;
-	ofn.lpstrInitialDir = nullptr;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+//#include "project/Variables.h"
 
-	if (GetOpenFileName(&ofn) == TRUE) {
-		// wchar_t* から std::string への変換
-		std::wstring ws(szFile);
-		return std::string(ws.begin(), ws.end());
-	}
-	return "";
-}
+struct Vec2 {
+	float x, y;
+};
+
+struct Vec3 {
+	float x, y, z;
+
+	//Vec2& xz;
+
+	//Vec3() : x(0), y(0), z(0), xz{ x, z } {}
+};
+
 
 int main() {
-	// テスト用コード
-	std::string filePath = OpenFileDialog();
-	if (!filePath.empty()) {
-		MessageBoxA(nullptr, filePath.c_str(), "選択されたファイル", MB_OK);
-	}
+
+	Vec3 vec3;
+	vec3.x = 1.0f;
+	vec3.y = 2.0f;
+	vec3.z = 3.0f;
+
+	printf("vec3.x: %f\n", vec3.x);
+	printf("vec3.y: %f\n", vec3.y);
+	printf("vec3.z: %f\n", vec3.z);
+
+	//printf(std::format("vec3.xy:{},{} \n", vec3.xy.x, vec3.xy.y).c_str());
+	//printf(std::format("vec3.xz:{},{} \n", vec3.xz.x, vec3.xz.y).c_str());
+	//printf(std::format("vec3.yx:{},{} \n", vec3.yx.x, vec3.yx.y).c_str());
+	//printf(std::format("vec3.zx:{},{} \n", vec3.zx.x, vec3.zx.y).c_str());
+	//printf(std::format("vec3.zy:{},{} \n", vec3.zy.x, vec3.zy.y).c_str());
+	//printf(std::format("vec3.yz:{},{} \n", vec3.yz.x, vec3.yz.y).c_str());
+
+
+	return 0;
 }
