@@ -1,40 +1,86 @@
-#include <stdio.h>
 #include <iostream>
-#include <format>
+#include "nlohmann/json.hpp"
 
-//#include "project/Variables.h"
-
-struct Vec2 {
-	float x, y;
-};
-
-struct Vec3 {
+struct Vector3 {
 	float x, y, z;
-
-	//Vec2& xz;
-
-	//Vec3() : x(0), y(0), z(0), xz{ x, z } {}
 };
+
+struct Vector4 {
+	float x, y, z, w;
+};
+
+struct Transform {
+	Vector3 position;
+	Vector3 rotation;
+	Vector3 scale;
+};
+
+struct Vertex {
+	float height;
+	Vector4 color;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vector3, x, y, z)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vector4, x, y, z, w)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vertex, height, color)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position, scale, rotation)
+
+//int main() {
+//
+//	size_t hash = typeid(Transform).hash_code();
+//	size_t stringHash = std::hash<std::string>{}("Transform");
+//	
+//	std::string compName = typeid(Transform).name();
+//	size_t pos = compName.find("struct ");
+//	if (pos != std::string::npos) {
+//		compName.erase(pos, std::string("struct ").length());
+//	}
+//	size_t compNameHash = std::hash<std::string>{}(compName);
+//
+//	std::cout << "Component name: " << compName << std::endl;
+//
+//	std::cout << "Hash of Transform type: " << hash << std::endl;
+//	std::cout << "Hash of 'Transform' string: " << stringHash << std::endl;
+//	std::cout << "Hash of component name: " << compNameHash << std::endl;
+//
+//	return 0;
+//}
+
+
+using json = nlohmann::json;
 
 
 int main() {
+	std::vector<Vertex> vertices = {
+		{ 1.0f, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ 2.0f, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ 3.0f, { 0.0f, 0.0f, 1.0f, 1.0f } }
+	};
 
-	Vec3 vec3;
-	vec3.x = 1.0f;
-	vec3.y = 2.0f;
-	vec3.z = 3.0f;
+	// Vertexをバイナリに変換
+	std::vector<uint8_t> vec(
+		reinterpret_cast<const uint8_t*>(vertices.data()),
+		reinterpret_cast<const uint8_t*>(vertices.data()) + vertices.size() * sizeof(Vertex)
+	);
 
-	printf("vec3.x: %f\n", vec3.x);
-	printf("vec3.y: %f\n", vec3.y);
-	printf("vec3.z: %f\n", vec3.z);
+	// バイナリをJSONに詰める
+	json j;
+	j["bin"] = json::binary(vec);
 
-	//printf(std::format("vec3.xy:{},{} \n", vec3.xy.x, vec3.xy.y).c_str());
-	//printf(std::format("vec3.xz:{},{} \n", vec3.xz.x, vec3.xz.y).c_str());
-	//printf(std::format("vec3.yx:{},{} \n", vec3.yx.x, vec3.yx.y).c_str());
-	//printf(std::format("vec3.zx:{},{} \n", vec3.zx.x, vec3.zx.y).c_str());
-	//printf(std::format("vec3.zy:{},{} \n", vec3.zy.x, vec3.zy.y).c_str());
-	//printf(std::format("vec3.yz:{},{} \n", vec3.yz.x, vec3.yz.y).c_str());
+	std::cout << j.dump(2) << "\n";
 
+	// BSON化 → 転送処理の代替
+	std::vector<uint8_t> bson = json::to_bson(j);
+	std::vector<uint8_t> bson2(bson.begin(), bson.end());
+
+	// 復元
+	json j2 = json::from_bson(bson2);
+	auto bin = j2["bin"].get_binary();
+
+	// バイナリデータを表示
+	std::cout << "復元したバイナリ (byte数: " << bin.size() << "):\n";
+	for (uint8_t b : bin) std::printf("%02d ", b);
+	std::cout << "\n";
 
 	return 0;
 }
