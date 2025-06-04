@@ -131,11 +131,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="project\ecs\ECS.cpp" />
+    <ClCompile Include="project\ecs\system\ISystem.cpp" />
+    <ClCompile Include="project\ecs\component\ComponentCollection.cpp" />
+    <ClCompile Include="project\ecs\component\ComponentArray.cpp" />
+    <ClCompile Include="project\ecs\component\IComponent.cpp" />
+    <ClCompile Include="project\ecs\entity\EntityFactory.cpp" />
+    <ClCompile Include="project\ecs\entity\IEntity.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="project\Variables.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="project\Variables.h" />
+    <ClInclude Include="project\ecs\ECS.h" />
+    <ClInclude Include="project\ecs\system\ISystem.h" />
+    <ClInclude Include="project\ecs\component\ComponentCollection.h" />
+    <ClInclude Include="project\ecs\component\ComponentArray.h" />
+    <ClInclude Include="project\ecs\component\IComponent.h" />
+    <ClInclude Include="project\ecs\entity\EntityFactory.h" />
+    <ClInclude Include="project\ecs\entity\IEntity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
