@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2024_PG3", "2024_PG3.vcxproj", "{363B695A-A7CD-49FC-9DF4-8EFD25C33AC6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "..\Lua\Lua.vcxproj", "{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{363B695A-A7CD-49FC-9DF4-8EFD25C33AC6}.Release|x64.Build.0 = Release|x64
 		{363B695A-A7CD-49FC-9DF4-8EFD25C33AC6}.Release|x86.ActiveCfg = Release|Win32
 		{363B695A-A7CD-49FC-9DF4-8EFD25C33AC6}.Release|x86.Build.0 = Release|Win32
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Debug|x64.ActiveCfg = Debug|x64
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Debug|x64.Build.0 = Debug|x64
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Debug|x86.ActiveCfg = Debug|Win32
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Debug|x86.Build.0 = Debug|Win32
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Release|x64.ActiveCfg = Release|x64
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Release|x64.Build.0 = Release|x64
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Release|x86.ActiveCfg = Release|Win32
+		{20F430CF-4DA8-43AF-B647-718E7DD0B5CE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

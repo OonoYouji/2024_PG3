@@ -1,6 +1,3 @@
-extern "C" {
-#include "lua.hpp"
-}
 
 int main() {
 
