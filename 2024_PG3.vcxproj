@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="project\ecs\entity\EntityCollection.cpp" />
     <ClCompile Include="project\ecs\ECS.cpp" />
     <ClCompile Include="project\ecs\system\ISystem.cpp" />
     <ClCompile Include="project\ecs\component\ComponentCollection.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="project\ecs\entity\EntityCollection.h" />
     <ClInclude Include="project\ecs\ECS.h" />
     <ClInclude Include="project\ecs\system\ISystem.h" />
     <ClInclude Include="project\ecs\component\ComponentCollection.h" />
