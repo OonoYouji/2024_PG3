@@ -2,9 +2,45 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="project\Variables.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="project\Variables.h" />
+    <None Include="project\Script.cs" />
+    <None Include="Externals\mono\cil\opcode.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Externals\mono\jit\jit.h" />
+    <ClInclude Include="Externals\mono\metadata\appdomain.h" />
+    <ClInclude Include="Externals\mono\metadata\assembly.h" />
+    <ClInclude Include="Externals\mono\metadata\attrdefs.h" />
+    <ClInclude Include="Externals\mono\metadata\blob.h" />
+    <ClInclude Include="Externals\mono\metadata\class.h" />
+    <ClInclude Include="Externals\mono\metadata\debug-helpers.h" />
+    <ClInclude Include="Externals\mono\metadata\debug-mono-symfile.h" />
+    <ClInclude Include="Externals\mono\metadata\environment.h" />
+    <ClInclude Include="Externals\mono\metadata\exception.h" />
+    <ClInclude Include="Externals\mono\metadata\image.h" />
+    <ClInclude Include="Externals\mono\metadata\loader.h" />
+    <ClInclude Include="Externals\mono\metadata\metadata.h" />
+    <ClInclude Include="Externals\mono\metadata\mono-config.h" />
+    <ClInclude Include="Externals\mono\metadata\mono-debug.h" />
+    <ClInclude Include="Externals\mono\metadata\mono-gc.h" />
+    <ClInclude Include="Externals\mono\metadata\object.h" />
+    <ClInclude Include="Externals\mono\metadata\object-forward.h" />
+    <ClInclude Include="Externals\mono\metadata\opcodes.h" />
+    <ClInclude Include="Externals\mono\metadata\profiler.h" />
+    <ClInclude Include="Externals\mono\metadata\profiler-events.h" />
+    <ClInclude Include="Externals\mono\metadata\reflection.h" />
+    <ClInclude Include="Externals\mono\metadata\row-indexes.h" />
+    <ClInclude Include="Externals\mono\metadata\sgen-bridge.h" />
+    <ClInclude Include="Externals\mono\metadata\threads.h" />
+    <ClInclude Include="Externals\mono\metadata\tokentype.h" />
+    <ClInclude Include="Externals\mono\metadata\verify.h" />
+    <ClInclude Include="Externals\mono\utils\mono-counters.h" />
+    <ClInclude Include="Externals\mono\utils\mono-dl-fallback.h" />
+    <ClInclude Include="Externals\mono\utils\mono-error.h" />
+    <ClInclude Include="Externals\mono\utils\mono-forward.h" />
+    <ClInclude Include="Externals\mono\utils\mono-jemalloc.h" />
+    <ClInclude Include="Externals\mono\utils\mono-logger.h" />
+    <ClInclude Include="Externals\mono\utils\mono-publib.h" />
   </ItemGroup>
 </Project>

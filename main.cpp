@@ -1,86 +1,95 @@
+
+/// std
 #include <iostream>
-#include "nlohmann/json.hpp"
 
-struct Vector3 {
-	float x, y, z;
-};
+/// externals
+#include "Externals/mono/jit/jit.h"
+#include "Externals/mono/metadata/assembly.h"
+#include "Externals/mono/metadata/debug-helpers.h"
 
-struct Vector4 {
-	float x, y, z, w;
-};
 
-struct Transform {
-	Vector3 position;
-	Vector3 rotation;
-	Vector3 scale;
-};
-
-struct Vertex {
-	float height;
-	Vector4 color;
-};
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vector3, x, y, z)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vector4, x, y, z, w)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Vertex, height, color)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position, scale, rotation)
 
 //int main() {
+//	// 1. Monoドメインの作成
+//	MonoDomain* domain = mono_jit_init("MyMonoDomain");
 //
-//	size_t hash = typeid(Transform).hash_code();
-//	size_t stringHash = std::hash<std::string>{}("Transform");
-//	
-//	std::string compName = typeid(Transform).name();
-//	size_t pos = compName.find("struct ");
-//	if (pos != std::string::npos) {
-//		compName.erase(pos, std::string("struct ").length());
+//	// 2. C#アセンブリ（exeやdll）をロード
+//	MonoAssembly* assembly = mono_domain_assembly_open(domain, "SampleScript.exe");
+//	if (!assembly) {
+//		printf("Failed to load assembly\n");
+//		return -1;
 //	}
-//	size_t compNameHash = std::hash<std::string>{}(compName);
 //
-//	std::cout << "Component name: " << compName << std::endl;
+//	// 3. アセンブリからMonoImageを取得
+//	MonoImage* image = mono_assembly_get_image(assembly);
 //
-//	std::cout << "Hash of Transform type: " << hash << std::endl;
-//	std::cout << "Hash of 'Transform' string: " << stringHash << std::endl;
-//	std::cout << "Hash of component name: " << compNameHash << std::endl;
+//	// 4. 実行したいメソッドを取得
+//	// 例: namespace=SampleNamespace, class=Program, method=Main
+//	MonoMethodDesc* methodDesc = mono_method_desc_new("SampleNamespace.Program:Main", /*include_namespace=*/true);
+//	MonoMethod* method = mono_method_desc_search_in_image(methodDesc, image);
+//	mono_method_desc_free(methodDesc);
+//
+//	if (!method) {
+//		printf("Failed to find method\n");
+//		return -1;
+//	}
+//
+//	// 5. メソッドの呼び出し（引数なしの場合）
+//	MonoObject* exception = nullptr;
+//	mono_runtime_invoke(method, nullptr, nullptr, &exception);
+//
+//	if (exception) {
+//		printf("Exception occurred during method invoke\n");
+//		return -1;
+//	}
+//
+//	// 6. 終了処理
+//	mono_jit_cleanup(domain);
 //
 //	return 0;
 //}
 
 
-using json = nlohmann::json;
-
 
 int main() {
-	std::vector<Vertex> vertices = {
-		{ 1.0f, { 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ 2.0f, { 0.0f, 1.0f, 0.0f, 1.0f } },
-		{ 3.0f, { 0.0f, 0.0f, 1.0f, 1.0f } }
-	};
+    // 初期化
+    mono_set_dirs("./Externals/mono/lib", "./Externals/mono/etc"); // Monoのパスに合わせて
+    MonoDomain* domain = mono_jit_init("MyDomain");
 
-	// Vertexをバイナリに変換
-	std::vector<uint8_t> vec(
-		reinterpret_cast<const uint8_t*>(vertices.data()),
-		reinterpret_cast<const uint8_t*>(vertices.data()) + vertices.size() * sizeof(Vertex)
-	);
+    // DLLをロード
+    MonoAssembly* assembly = mono_domain_assembly_open(domain, "Player.dll");
+    if (!assembly) {
+        std::cerr << "Failed to load Player.dll" << std::endl;
+        return 1;
+    }
 
-	// バイナリをJSONに詰める
-	json j;
-	j["bin"] = json::binary(vec);
+    // Image取得
+    MonoImage* image = mono_assembly_get_image(assembly);
 
-	std::cout << j.dump(2) << "\n";
+    // クラス取得（namespaceが空文字の場合 ""）
+    MonoClass* playerClass = mono_class_from_name(image, "", "Player");
+    if (!playerClass) {
+        std::cerr << "Failed to find Player class" << std::endl;
+        return 1;
+    }
 
-	// BSON化 → 転送処理の代替
-	std::vector<uint8_t> bson = json::to_bson(j);
-	std::vector<uint8_t> bson2(bson.begin(), bson.end());
+    // インスタンス作成
+    MonoObject* playerInstance = mono_object_new(domain, playerClass);
+    mono_runtime_object_init(playerInstance);
 
-	// 復元
-	json j2 = json::from_bson(bson2);
-	auto bin = j2["bin"].get_binary();
+    // メソッド取得＆呼び出し
+    MonoMethodDesc* methodDesc = mono_method_desc_new(":Update()", /*include_namespace=*/false);
+    MonoMethod* method = mono_method_desc_search_in_class(methodDesc, playerClass);
 
-	// バイナリデータを表示
-	std::cout << "復元したバイナリ (byte数: " << bin.size() << "):\n";
-	for (uint8_t b : bin) std::printf("%02d ", b);
-	std::cout << "\n";
+    if (!method) {
+        std::cerr << "Failed to find Update() method" << std::endl;
+        return 1;
+    }
 
-	return 0;
+    mono_runtime_invoke(method, playerInstance, nullptr, nullptr);
+    mono_method_desc_free(methodDesc);
+
+    // 終了処理
+    mono_jit_cleanup(domain);
+    return 0;
 }
