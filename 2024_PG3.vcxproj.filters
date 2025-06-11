@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="project\LuaScripts\Script.lua" />
+  </ItemGroup>
 </Project>
