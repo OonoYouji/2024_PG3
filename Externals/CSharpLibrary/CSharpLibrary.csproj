@@ -45,6 +45,8 @@
     <Compile Include="MonoBehavior.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptComponent.cs" />
+    <Compile Include="Vec3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

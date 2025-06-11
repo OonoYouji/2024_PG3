@@ -10,16 +10,72 @@
 #include "Externals/mono/metadata/debug-helpers.h"
 
 
+struct Vector3 {
+	float x, y, z;
+};
 
-// グローバル変数でMonoの状態を保持
-MonoObject* playerInstance = nullptr;
-MonoMethod* updateMethod = nullptr;
+class Transform {
+public:
+	Vector3 position;
+	Vector3 rotate;
+	Vector3 scale;
+};
+
+class Entity {
+public:
+	int id;
+	Transform transform;
+};
+
+
+std::unordered_map<int, Entity> entities;
+int nextEntityId = 1;
+
+Entity* CreateEntity() {
+	Entity entity;
+	entity.id = nextEntityId++;
+	entity.transform.position = { 0.0f, 0.0f, 0.0f };
+	entity.transform.rotate = { 0.0f, 0.0f, 0.0f };
+	entity.transform.scale = { 1.0f, 1.0f, 1.0f };
+	entities[entity.id] = entity;
+	return &entities[entity.id];
+}
+
+
+extern "C" {
+	Transform* Internal_GetTransform(int entityId) {
+		auto it = entities.find(entityId);
+		if (it != entities.end()) {
+			return &it->second.transform;
+		}
+		return nullptr; // エンティティが見つからない場合はnullptrを返す
+	}
+
+	void Internal_SetTransform(int entityId, Transform* transform) {
+		auto it = entities.find(entityId);
+		if (it != entities.end()) {
+			it->second.transform = *transform; // エンティティのTransformを更新
+		} else {
+			std::cerr << "Entity with ID " << entityId << " not found." << std::endl;
+		}
+	}
+
+}
+
+
+void BindInternalCalls() {
+	mono_add_internal_call("ONEngine.ScriptComponent::Internal_GetTransform", (void*)Internal_GetTransform);
+	mono_add_internal_call("ONEngine.ScriptComponent::Internal_SetTransform", (void*)Internal_SetTransform);
+}
 
 
 struct Script {
+
+	uint32_t gcHandle;
+
 	MonoClass* monoClass;
 	MonoObject* instance;
-	
+
 	MonoMethod* initMethod = nullptr;
 	MonoMethod* updateMethod = nullptr;
 };
@@ -60,6 +116,11 @@ public:
 			mono_jit_cleanup(domain);
 			domain = nullptr;
 		}
+
+		for (auto& script : scripts) {
+			mono_gchandle_free(script.gcHandle);
+		}
+
 		scripts.clear();
 	}
 
@@ -75,7 +136,7 @@ public:
 		/// クラスのインスタンスを生成
 		MonoObject* obj = mono_object_new(domain, monoClass);
 		mono_runtime_object_init(obj); /// クラスの初期化、コンストラクタをイメージ
-
+		uint32_t gcHandle = mono_gchandle_new(obj, false); /// GCハンドルを取得（必要に応じて）
 
 		/// 先に定義しておく
 		MonoMethodDesc* desc = nullptr;
@@ -99,11 +160,29 @@ public:
 			return;
 		}
 
+		Entity* entity = CreateEntity();
+		int entityId = entity->id;
+
+
+		MonoClassField* field = nullptr;
+		MonoClass* currentClass = monoClass;
+		while (currentClass && !field) {
+			field = mono_class_get_field_from_name(currentClass, "entityId");
+			currentClass = mono_class_get_parent(currentClass); // 親クラスを探索
+		}
+
+		if (field) {
+			mono_field_set_value(obj, field, &entityId);
+		} else {
+			std::cerr << "Failed to find field entityId in class: " << _className << std::endl;
+		}
+
 		if (initMethod && obj) {
 			mono_runtime_invoke(initMethod, obj, nullptr, nullptr);
 		}
 
-		scripts.push_back({ monoClass, obj, initMethod, updateMethod });
+
+		scripts.push_back({ gcHandle, monoClass, obj, initMethod, updateMethod });
 	}
 
 
@@ -123,9 +202,10 @@ ScriptManager scriptManager;
 // 初期化処理（一度だけ呼ぶ）
 void InitializeMono() {
 	scriptManager.Initialize();
+	BindInternalCalls();
 
 	scriptManager.AddScript("Player");
-	scriptManager.AddScript("Enemy");
+	//scriptManager.AddScript("Enemy");
 
 }
 

@@ -113,6 +113,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)Externals/mono/mono-2.0-sgen.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y /I /E "$(ProjectDir)Resources" "$(OutDir)Resources"
+xcopy /Y /I "$(ProjectDir)Externals\mono\mono-2.0-sgen.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,6 +137,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)Externals/mono/mono-2.0-sgen.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y /I /E "$(ProjectDir)Resources" "$(OutDir)Resources"
+xcopy /Y /I "$(ProjectDir)Externals\mono\mono-2.0-sgen.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
