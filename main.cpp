@@ -2,6 +2,7 @@
 /// std
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 /// externals
 #include "Externals/mono/jit/jit.h"
@@ -18,7 +19,9 @@ MonoMethod* updateMethod = nullptr;
 struct Script {
 	MonoClass* monoClass;
 	MonoObject* instance;
-	MonoMethod* updateMethod;
+	
+	MonoMethod* initMethod = nullptr;
+	MonoMethod* updateMethod = nullptr;
 };
 
 
@@ -62,27 +65,45 @@ public:
 
 	void AddScript(const std::string& _className) {
 
-		/// classを取得
+		/// MonoImageから指定されたクラスを取得(namespaceは""で省略)
 		MonoClass* monoClass = mono_class_from_name(image, "", _className.c_str());
 		if (!monoClass) {
 			std::cerr << "Failed to find class: " << _className << std::endl;
 			return;
 		}
 
-		/// インスタンスを生成
+		/// クラスのインスタンスを生成
 		MonoObject* obj = mono_object_new(domain, monoClass);
-		mono_runtime_object_init(obj);
+		mono_runtime_object_init(obj); /// クラスの初期化、コンストラクタをイメージ
 
-		MonoMethodDesc* desc = mono_method_desc_new(":Update()", false);
-		MonoMethod* method = mono_method_desc_search_in_class(desc, monoClass);
+
+		/// 先に定義しておく
+		MonoMethodDesc* desc = nullptr;
+
+		/// Updateメソッドを取得
+		desc = mono_method_desc_new(":Initialize()", false);
+		MonoMethod* initMethod = mono_method_desc_search_in_class(desc, monoClass);
+		mono_method_desc_free(desc);
+		if (!initMethod) {
+			std::cerr << "Failed to find method Initialize in class: " << _className << std::endl;
+			return;
+		}
+
+		/// Updateメソッドを取得
+		desc = mono_method_desc_new(":Update()", false);
+		MonoMethod* updateMethod = mono_method_desc_search_in_class(desc, monoClass);
 		mono_method_desc_free(desc);
 
-		if (!method) {
+		if (!updateMethod) {
 			std::cerr << "Failed to find method Update in class: " << _className << std::endl;
 			return;
 		}
 
-		scripts.push_back({ monoClass, obj, method });
+		if (initMethod && obj) {
+			mono_runtime_invoke(initMethod, obj, nullptr, nullptr);
+		}
+
+		scripts.push_back({ monoClass, obj, initMethod, updateMethod });
 	}
 
 
@@ -105,6 +126,7 @@ void InitializeMono() {
 
 	scriptManager.AddScript("Player");
 	scriptManager.AddScript("Enemy");
+
 }
 
 // 毎フレーム呼ぶ更新処理
