@@ -1,15 +1,14 @@
 ﻿using System;
 
-public class Player {
-//public class Player : MonoBehavior {
+public class Player : MonoBehavior {
 
-	public void Initialize() {
+	public override void Initialize() {
 		Console.WriteLine("Player.Init() called!");
 	}
 
-	public void Update() {
+	public override void Update() {
 		Console.WriteLine("Player.Update() called!");
 	}
-	
-	
+
+
 }
