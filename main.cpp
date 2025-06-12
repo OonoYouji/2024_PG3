@@ -160,22 +160,21 @@ public:
 			return;
 		}
 
-		Entity* entity = CreateEntity();
-		int entityId = entity->id;
+		//Entity* entity = CreateEntity();
+		//int entityId = entity->id;
 
+		//MonoClassField* field = nullptr;
+		//MonoClass* currentClass = monoClass;
+		//while (currentClass && !field) {
+		//	field = mono_class_get_field_from_name(currentClass, "entityId");
+		//	currentClass = mono_class_get_parent(currentClass); // 親クラスを探索
+		//}
 
-		MonoClassField* field = nullptr;
-		MonoClass* currentClass = monoClass;
-		while (currentClass && !field) {
-			field = mono_class_get_field_from_name(currentClass, "entityId");
-			currentClass = mono_class_get_parent(currentClass); // 親クラスを探索
-		}
-
-		if (field) {
-			mono_field_set_value(obj, field, &entityId);
-		} else {
-			std::cerr << "Failed to find field entityId in class: " << _className << std::endl;
-		}
+		//if (field) {
+		//	mono_field_set_value(obj, field, &entityId);
+		//} else {
+		//	std::cerr << "Failed to find field entityId in class: " << _className << std::endl;
+		//}
 
 		if (initMethod && obj) {
 			mono_runtime_invoke(initMethod, obj, nullptr, nullptr);

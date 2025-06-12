@@ -4,23 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace ONEngine {
 
-	public struct Vector3 {
-		public float x, y, z;
-
-		public Vector3(float x, float y, float z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-	}
-
-	[StructLayout(LayoutKind.Sequential)]
-	public class Transform {
-		public Vector3 position;
-		public Vector3 rotation;
-		public Vector3 scale;
-	}
-
 	public class ScriptComponent {
 		public int entityId;
 		internal int nativeEntityId;
