@@ -9,10 +9,10 @@ public class Enemy : ScriptComponent {
 
 	public override void Update() {
 
-		if (transform == null) {
-			Console.WriteLine("Transform is null, cannot update position.");
-			return;
-		}
+		//if (transform == null) {
+		//	Console.WriteLine("Transform is null, cannot update position.");
+		//	return;
+		//}
 
 		Transform t = transform; // Get the current transform
 		t.position.x += 1.0f; // Increment the x position by 1.0

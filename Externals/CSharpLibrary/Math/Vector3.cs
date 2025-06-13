@@ -1,5 +1,6 @@
-﻿
+﻿using System.Runtime.InteropServices;
 
+[StructLayout(LayoutKind.Sequential)]
 public struct Vector3 {
 	public float x, y, z;
 

@@ -29,7 +29,7 @@ public:
 
 
 std::unordered_map<int, Entity> entities;
-int nextEntityId = 1;
+int nextEntityId = 0;
 
 Entity* CreateEntity() {
 	Entity entity;
@@ -160,8 +160,8 @@ public:
 			return;
 		}
 
-		//Entity* entity = CreateEntity();
-		//int entityId = entity->id;
+		Entity* entity = CreateEntity();
+		int entityId = entity->id;
 
 		//MonoClassField* field = nullptr;
 		//MonoClass* currentClass = monoClass;
