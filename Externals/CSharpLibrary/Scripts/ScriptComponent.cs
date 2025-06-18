@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace ONEngine {
 
 	public class ScriptComponent {
-		internal int nativeEntityId = 0;
+		internal int nativeEntityId = -1;
 
 		public Transform transform {
 			get {
@@ -17,6 +17,17 @@ namespace ONEngine {
 			}
 		}
 
+		public int EntityId {
+			get {
+				if (nativeEntityId == -1) {
+					nativeEntityId = CreateEntity();
+				}
+				return nativeEntityId;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.InternalCall)]
+		private static extern int CreateEntity();
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		private static extern IntPtr Internal_GetTransform(int entityId);

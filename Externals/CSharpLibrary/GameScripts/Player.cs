@@ -1,12 +1,12 @@
 ﻿using ONEngine;
 using System;
-
+using System.Diagnostics;
 public class Player : ScriptComponent {
 
 	public override void Initialize() {
 		Console.WriteLine("Player.Init() called!");
-		nativeEntityId = 0;
-		//transform = new Transform();
+		nativeEntityId = 0; // Initialize the native entity ID
+								   //int id = EntityId;
 	}
 
 	public override void Update() {
@@ -20,8 +20,7 @@ public class Player : ScriptComponent {
 		transform = t; // Update the transform with the new position
 
 		//Console.WriteLine("Player position updated.");
-		Console.WriteLine($"Player position updated to: ({t.position.x}, {t.position.y}, {t.position.z})");
-		Console.WriteLine("Player.Update() called!");
+		Debug.WriteLine($"Player position updated to: ({t.position.x}, {t.position.y}, {t.position.z})");
 	}
 
 

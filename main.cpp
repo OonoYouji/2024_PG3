@@ -66,6 +66,7 @@ extern "C" {
 void BindInternalCalls() {
 	mono_add_internal_call("ONEngine.ScriptComponent::Internal_GetTransform", (void*)Internal_GetTransform);
 	mono_add_internal_call("ONEngine.ScriptComponent::Internal_SetTransform", (void*)Internal_SetTransform);
+	mono_add_internal_call("ONEngine.ScriptComponent::CreateEntity", (void*)CreateEntity);
 }
 
 
@@ -163,19 +164,6 @@ public:
 		Entity* entity = CreateEntity();
 		int entityId = entity->id;
 
-		//MonoClassField* field = nullptr;
-		//MonoClass* currentClass = monoClass;
-		//while (currentClass && !field) {
-		//	field = mono_class_get_field_from_name(currentClass, "entityId");
-		//	currentClass = mono_class_get_parent(currentClass); // 親クラスを探索
-		//}
-
-		//if (field) {
-		//	mono_field_set_value(obj, field, &entityId);
-		//} else {
-		//	std::cerr << "Failed to find field entityId in class: " << _className << std::endl;
-		//}
-
 		if (initMethod && obj) {
 			mono_runtime_invoke(initMethod, obj, nullptr, nullptr);
 		}
@@ -186,9 +174,16 @@ public:
 
 
 	void UpdateAll() {
+		int entityId = 0; // ここでは単純に0を使用、実際のゲームでは適切なIDを使用する
 		for (auto& script : scripts) {
 			if (script.updateMethod && script.instance) {
 				mono_runtime_invoke(script.updateMethod, script.instance, nullptr, nullptr);
+
+
+				//Vector3& v= entities[entityId].transform.position;
+				///// vの出力
+				//std::cout << "Entity ID: " << entityId << ", Position: ("
+				//	<< v.x << ", " << v.y << ", " << v.z << ")" << std::endl;
 			}
 		}
 	}
@@ -204,7 +199,7 @@ void InitializeMono() {
 	BindInternalCalls();
 
 	scriptManager.AddScript("Player");
-	//scriptManager.AddScript("Enemy");
+	scriptManager.AddScript("Enemy");
 
 }
 
