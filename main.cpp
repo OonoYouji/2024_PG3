@@ -1,125 +1,145 @@
-#include <string>
-#include <iostream>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+//
+// using Key = std::pair<int, int>;
+// using Map = std::map<Key, int>;
+//
+// void print(const Map& m) {
+//  for (auto& [key, value] : m) {
+//    std::cout << "Key: (" << key.first << ", " << key.second
+//              << "), Value: " << value << std::endl;
+//  }
+//}
+//
+// int main(void) {
+//  Map map;
+//  map[std::make_pair(1, 2)] = 3;
+//  map[std::make_pair(4, 5)] = 6;
+//  map[std::make_pair(7, 8)] = 9;
+//
+//  print(map);
+//
+//  return 0;
+//}
+
+// class A {
+//  public:
+//   A() { printf("A::A()\n"); }
+// };
+//
+// class B {
+//  public:
+//   B() { printf("B::B()\n"); }
+// };
+// class C : public A, public B {
+//  public:
+//   C() { printf("C::C()\n"); }
+// };
+//
+// int main() {
+//   C c;
+//   return 0;
+// }
+
+/// ファイル数をカウントする
+
 #include <filesystem>
-#include <cstdlib>
+#include <iostream>
 
-#include "project/FactoryRegister.h"
+namespace fs = std::filesystem;
 
-class CreateClassFileCommand {
-public:
+class FileCounter {
+ public:
+  FileCounter() : count_(0), total_lines_(0) {}
 
-	void Execute(const std::string& _className, const std::string& _directory = "./") {
-		///< ファイル名を作成
-		std::string&& headerFilepath = _directory + "/" + _className + ".h";
-		std::string&& cppFilepath = _directory + "/" + _className + ".cpp";
+  int count() const { return count_; }
+  long long totalLines() const { return total_lines_; }
+  void reset() {
+    count_ = 0;
+    total_lines_ = 0;
+    extensions_.clear();
+  }
 
-		/// .hファイルの作成
-		std::ifstream templateHeaderFile(templateHeaderFilepath_, std::ios::binary);
-		std::ofstream newHeaderFile(headerFilepath, std::ios::binary);
-		std::string headerContent((std::istreambuf_iterator<char>(templateHeaderFile)), std::istreambuf_iterator<char>());
-		size_t pos = 0;
-		while ((pos = headerContent.find("Template", pos)) != std::string::npos) {
-			headerContent.replace(pos, 8, _className);
-			pos += _className.length();
-		}
-		newHeaderFile << headerContent;
+  void addExtension(const std::string& ext) {
+    // 拡張子は小文字/大文字の区別をそのまま扱うが、必要なら正規化可能
+    extensions_.push_back(ext);
+  }
 
-		///< cppファイルの作成
-		std::ifstream templateCppFile(templateCppFilepath_, std::ios::binary);
-		std::ofstream newCppFile(cppFilepath, std::ios::binary);
-		std::string cppContent((std::istreambuf_iterator<char>(templateCppFile)), std::istreambuf_iterator<char>());
-		pos = 0;
-		while ((pos = cppContent.find("Template", pos)) != std::string::npos) {
-			cppContent.replace(pos, 8, _className);
-			pos += _className.length();
-		}
-		newCppFile << cppContent;
+  void countFilesWithExtensions(const fs::path& root) {
+    try {
+      if (!fs::exists(root)) {
+        std::cerr << "Path does not exist: " << root << '\n';
+        return;
+      }
 
-		system("premake5 vs2022");
-	}
+      // 再帰的に走査
+      for (auto const& entry : fs::recursive_directory_iterator(
+               root, fs::directory_options::skip_permission_denied)) {
+        try {
+          if (!entry.is_regular_file()) continue;
 
-private:
-	std::string templateHeaderFilepath_ = "./project/Template.h";
-	std::string templateCppFilepath_ = "./project/Template.cpp";
+          std::string ext = entry.path().extension().string();
+          if (std::find(extensions_.begin(), extensions_.end(), ext) !=
+              extensions_.end()) {
+            ++count_;
+            long long lines = countLinesInFile(entry.path());
+            total_lines_ += lines;
+          }
+        } catch (const fs::filesystem_error& e) {
+          // 個々のエントリでアクセスエラーなどが起きた場合は警告を出して続行
+          std::cerr << "Filesystem error for entry: " << e.what() << '\n';
+        }
+      }
+    } catch (const fs::filesystem_error& e) {
+      std::cerr << "Failed to iterate directory: " << e.what() << '\n';
+    }
+  }
 
-	std::string projectStr = "2024_PG3";
+ private:
+  long long countLinesInFile(const fs::path& filepath) {
+    std::ifstream ifs(filepath, std::ios::in);
+    if (!ifs) {
+      std::cerr << "Failed to open file: " << filepath << '\n';
+      return 0;
+    }
+    long long lines = 0;
+    std::string line;
+    while (std::getline(ifs, line)) {
+      ++lines;
+    }
+    return lines;
+  }
 
-	void AddFileToProject(const std::string& filepath) {
-		// premakeを使用してプロジェクトファイルにファイルを追加する処理をここに実装
-		std::string command = "premake5 --file=premake5.lua vs2019";
-		if (std::system(command.c_str()) != 0) {
-			std::cerr << "premakeコマンドの実行に失敗しました: " << command << std::endl;
-		}
-	}
+  int count_;
+  long long total_lines_;
+  std::vector<std::string> extensions_;
 };
 
-void ModifyFactoryRegister(const std::string& filePath, const std::string& includePath, const std::string& registerCall) {
-	std::ifstream inFile(filePath);
-	if (!inFile) {
-		std::cerr << "ファイルを開けませんでした: " << filePath << std::endl;
-		return;
-	}
+int main(int argc, char* argv[]) {
+  FileCounter counter;
+  counter.addExtension(".cpp");
+  counter.addExtension(".h");
+  // counter.addExtension(".hpp");
+  // counter.addExtension(".c");
+  // counter.addExtension(".txt");  // 必要なら追加
 
-	std::string fileContent;
-	std::string line;
-	bool includeAdded = false;
-	bool registerAdded = false;
+  fs::path target;
+  if (argc > 1) {
+    target = fs::path(argv[1]);
+  } else {
+    // デフォルトパスを必要に応じて変更してください
+    target = "C:\\Users\\k023g\\source\\repos\\ONEngine\\Project\\Engine";
+  }
 
-	while (std::getline(inFile, line)) {
-		// `/// include` の直後に `#include` を追加
-		if (line.find("/// include") != std::string::npos && !includeAdded) {
-			fileContent += line + "\n";
-			fileContent += "#include \"" + includePath + "\"\n";
-			includeAdded = true;
-			continue;
-		}
+  counter.countFilesWithExtensions(target);
 
-		// `void FactoryRegister::Registers()` の中に処理を追加
-		if (line.find("void FactoryRegister::Registers() {") != std::string::npos && !registerAdded) {
-			fileContent += line + "\n";
-			fileContent += "    " + registerCall + ";\n";
-			registerAdded = true;
-			continue;
-		}
+  std::cout << "Number of matching files: " << counter.count() << std::endl;
+  std::cout << "Total lines across matched files: " << counter.totalLines()
+            << std::endl;
 
-		fileContent += line + "\n";
-	}
-
-	inFile.close();
-
-	// ファイルを上書き
-	std::ofstream outFile(filePath);
-	if (!outFile) {
-		std::cerr << "ファイルを書き込めませんでした: " << filePath << std::endl;
-		return;
-	}
-	outFile << fileContent;
-	outFile.close();
-}
-
-int main() {
-
-	FactoryRegister factory;
-	factory.Registers();
-	CreateClassFileCommand command;
-
-	auto CreateAndRegisterMesthodCreate = [&factory, &command](const std::string& _className) {
-		command.Execute(_className, "./project/createClass");
-		ModifyFactoryRegister("./project/FactoryRegister.cpp", "./createClass/" + _className + ".h", "factory_.Register<" + _className + ">()");
-	};
-
-	while (true) {
-		std::string className;
-		std::cout << "クラス名を入力してください (終了するには 'exit' と入力): ";
-		std::cin >> className;
-
-		if (className == "exit") {
-			break;
-		}
-
-		CreateAndRegisterMesthodCreate(className);
-	}
-
-	return 0;
+  return 0;
 }

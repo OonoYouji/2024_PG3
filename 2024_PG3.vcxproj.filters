@@ -3,13 +3,8 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="project\Template.cpp" />
-    <ClCompile Include="project\FactoryRegister.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="answer.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="project\Template.h" />
-    <ClInclude Include="project\FactoryRegister.h" />
   </ItemGroup>
 </Project>

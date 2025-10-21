@@ -131,12 +131,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="project\FactoryRegister.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="project\Template.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="project\FactoryRegister.h" />
     <ClInclude Include="project\Template.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
